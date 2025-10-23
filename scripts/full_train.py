@@ -135,8 +135,8 @@ if __name__ == '__main__':
     if args.extra_training_args != "": 
         train_chunk_args += " " + args.extra_training_args
 
-    hierarchy_creator_args = "submodules/gaussianhierarchy/build/Release/GaussianHierarchyCreator.exe " if os_name == "Windows" else "submodules/gaussianhierarchy/build/GaussianHierarchyCreator "
-    hierarchy_creator_args = os.path.join(f_path.parent.parent, hierarchy_creator_args)
+    creator_args = "submodules/gaussian/build/Release/GaussianCreator.exe " if os_name == "Windows" else "submodules/gaussian/build/GaussianHierarchyCreator "
+    creator_args = os.path.join(f_path.parent.parent, hierarchy_creator_args)
 
     post_opt_chunk_args =  " ".join([
         "python", "-u train_post.py",
@@ -182,11 +182,11 @@ if __name__ == '__main__':
                     if not args.keep_running:
                         sys.exit(1)
 
-                # Generate a hierarchy within each chunks
-            print(f"Generating hierarchy for chunk {chunk_name}")
+                # Generate a within each chunks
+            print(f"Generating for chunk {chunk_name}")
             try:
                 subprocess.run(
-                hierarchy_creator_args + " ".join([
+                creator_args + " ".join([
                         os.path.join(trained_chunk, "point_cloud/iteration_30000/point_cloud.ply"),
                         source_chunk,
                         trained_chunk,
@@ -195,7 +195,7 @@ if __name__ == '__main__':
                     shell=True, check=True, text=True
                 )
             except subprocess.CalledProcessError as e:
-                print(f"Error executing hierarchy_creator: {e}")
+                print(f"Error executing creator: {e}")
                 if not args.keep_running:
                     sys.exit(1)
 
@@ -205,7 +205,7 @@ if __name__ == '__main__':
                 subprocess.run(
                     post_opt_chunk_args + " -s "+ source_chunk + 
                     " --model_path " + trained_chunk +
-                    " --hierarchy " + os.path.join(trained_chunk, "hierarchy.hier"),
+                    " --hie " + os.path.join(trained_chunk, "hier.hier"),
                     shell=True, check=True
                 )
             except subprocess.CalledProcessError as e:
@@ -265,3 +265,4 @@ if __name__ == '__main__':
 
     end_time = time.time()
     print(f"Total time elapsed for training and consolidation {(end_time - start_time)/60.0} minutes.")
+
